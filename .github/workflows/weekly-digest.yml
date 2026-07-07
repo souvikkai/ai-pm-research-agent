@@ -22,6 +22,13 @@ jobs:
       - name: Run tests
         run: pytest
       - name: Generate digest
+        env:
+          AI_PM_AGENT_USE_LLM_SUMMARIES: "true"
+          AI_PM_AGENT_USE_LLM_ITEM_SUMMARIES: "false"
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_MODEL: deepseek-v4-flash
+          DEEPSEEK_MAX_TOKENS: "2500"
+          AI_PM_AGENT_TIMEZONE: America/Phoenix
         run: ai-pm-research-agent --lookback-days 7
       - name: Commit report
         run: |
