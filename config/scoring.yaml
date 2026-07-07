@@ -1,0 +1,201 @@
+weights:
+  ai_pm_relevance: 0.15
+  ai_infrastructure_relevance: 0.20
+  compiler_runtime_quantization_relevance: 0.20
+  edge_automotive_industrial_relevance: 0.15
+  big_tech_accelerator_relevance: 0.10
+  product_strategy_relevance: 0.10
+  linkedin_portfolio_potential: 0.10
+
+thresholds:
+  include_min_score: 1.45
+  fallback_min_items: 10
+  top_items: 10
+  summarize_limit: 24
+
+keyword_groups:
+  ai_pm_relevance:
+    - roadmap
+    - platform
+    - developer experience
+    - product
+    - customer
+    - enterprise
+    - adoption
+    - workflow
+    - pricing
+    - launch
+  ai_infrastructure_relevance:
+    - inference
+    - serving
+    - llm
+    - token
+    - tokens
+    - decoding
+    - scheduler
+    - workload
+    - memory
+    - gpu
+    - tpu
+    - accelerator
+    - latency
+    - throughput
+    - batching
+    - kv cache
+    - observability
+    - autoscaling
+    - kubernetes
+    - datacenter
+  compiler_runtime_quantization_relevance:
+    - mlir
+    - tvm
+    - xla
+    - iree
+    - tensorrt
+    - tensorrt-llm
+    - triton
+    - onnx runtime
+    - openvino
+    - executorch
+    - torch.compile
+    - compiler
+    - runtime
+    - graph compiler
+    - graph compilers
+    - graph lowering
+    - graph optimization
+    - operator fusion
+    - kernel generation
+    - lowering
+    - cuda
+    - rocm
+    - quantization
+    - int8
+    - int4
+    - fp8
+    - mxfp4
+    - awq
+    - gptq
+    - smoothquant
+    - gguf
+    - llama.cpp
+    - kernel
+  edge_automotive_industrial_relevance:
+    - edge
+    - automotive
+    - adas
+    - robotics
+    - industrial
+    - tinyml
+    - embedded
+    - npu
+    - dsp
+    - sensor
+    - low-power
+    - real-time
+    - iso 26262
+    - perception
+    - autonomous
+    - machine vision
+    - safety-critical
+    - bev
+  big_tech_accelerator_relevance:
+    - google
+    - deepmind
+    - meta
+    - amazon
+    - aws
+    - microsoft
+    - apple
+    - openai
+    - anthropic
+    - nvidia
+    - nemotron
+    - claude
+    - pytorch
+    - azure
+    - amd
+    - qualcomm
+    - intel
+    - arm
+    - groq
+    - cerebras
+    - tenstorrent
+  product_strategy_relevance:
+    - strategy
+    - competitive
+    - market
+    - moat
+    - ecosystem
+    - sdk
+    - api
+    - developer
+    - docs
+    - release
+    - model zoo
+    - documentation
+    - enablement
+    - pmf
+    - cost
+  linkedin_portfolio_potential:
+    - benchmark
+    - tutorial
+    - open source
+    - demo
+    - evaluation
+    - comparison
+    - hands-on
+    - case study
+    - architecture
+
+priority_domains:
+  compiler_runtime:
+    - MLIR
+    - TVM
+    - XLA
+    - IREE
+    - TensorRT-LLM
+    - OpenVINO
+    - ONNX Runtime
+    - ExecuTorch
+    - torch.compile
+    - Triton compiler
+    - CUDA graphs
+    - GGUF
+    - HF Optimum
+  quantization:
+    - INT8
+    - INT4
+    - W4A8
+    - W4A16
+    - FP8
+    - BF16
+    - OCP MX
+    - MXFP4
+    - AWQ
+    - GPTQ
+    - SmoothQuant
+    - KV cache compression
+  edge_automotive_industrial:
+    - edge inference
+    - automotive perception
+    - ADAS
+    - robotics
+    - industrial inspection
+    - smart sensors
+    - low-power inference
+    - real-time inference
+  datacenter_serving:
+    - vLLM
+    - Triton Inference Server
+    - Ray Serve
+    - KServe
+    - SGLang
+    - prefill decode
+    - PagedAttention
+    - continuous batching
+    - GPU scheduling
+    - H100
+    - B200
+    - MI300
+    - Trainium
