@@ -64,10 +64,11 @@ def _build_prompt(ranked_items: list[RankedItem], summaries: dict[str, ItemSumma
                 ]
             )
         )
+    ranked_items_text = "\n\n".join(item_blocks)
 
     return f"""Ranked weekly items:
 
-{"\n\n".join(item_blocks)}
+{ranked_items_text}
 
 Return JSON with exactly these keys:
 {{
