@@ -24,7 +24,8 @@ class ArxivCollector(Collector):
         cutoff = days_ago(lookback_days)
         items: list[CandidateItem] = []
         for category in self.categories:
-            query = f"cat:{category} AND ({' OR '.join(f'all:\"{term}\"' for term in self.query_terms)})"
+            term_query = " OR ".join(f'all:"{term}"' for term in self.query_terms)
+            query = f"cat:{category} AND ({term_query})"
             params = {
                 "search_query": query,
                 "start": 0,
