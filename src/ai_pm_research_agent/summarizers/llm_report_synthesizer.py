@@ -113,12 +113,22 @@ Return JSON with exactly these keys:
   "deep_dive": {{
     "title": "title from one ranked item",
     "url": "source URL",
-    "why_30_60_minutes": "why this deserves a focused read",
-    "questions_to_answer": [
-      "3 practical PM questions"
-    ]
+    "authors": "authors if available from metadata, otherwise Unknown authors",
+    "arxiv_link": "arXiv or source URL",
+    "why_this_one": "1 to 2 sentences on why it ranked highest this week",
+    "benchmark_skepticism": {{
+      "baseline_compared_against": "baseline if extractable from the provided source summary, otherwise leave as ______",
+      "hardware_batch_size_seq_length": "hardware / batch size / sequence length if extractable from the provided source summary, otherwise leave as ______",
+      "production_survival_check": "whether the claim would likely survive production conditions if extractable, otherwise leave as ______"
+    }}
   }}
-}}"""
+}}
+
+Deep dive rules:
+- Never fill in the extraction sentence. Leave the underscores as-is.
+- Only pre-fill benchmark skepticism fields when the answer is extractable from the provided source summary or metadata.
+- If baseline, hardware, batch size, or sequence length are not clearly provided, return "______" for that field.
+- LinkedIn drafts should treat the completed extraction sentence as the intended seed for the post, but must not invent that completed sentence."""
 
 
 def _parse_json(content: str) -> dict:

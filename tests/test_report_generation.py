@@ -49,3 +49,12 @@ def test_report_generator_writes_updated_section_structure(tmp_path):
     assert "## 7. Big Tech, AI Lab, and Competitive Watch" in report
     assert "### AI Accelerator and Developer Platform Competitive Intelligence" in report
     assert "### Option D: Compiler / quantization / edge AI angle" in report
+    assert "## Recommended Deep Dive of the Week" in report
+    assert "### Reading protocol (20-30 min)" in report
+    assert "- [ ] Pass 1 (3 min): Abstract + conclusion only." in report
+    assert "> This paper showed ______ under conditions ______." in report
+    assert "> This changes the ______ decision for ______ because ______." in report
+    assert "### Benchmark skepticism check" in report
+    assert "- Baseline compared against: ______" in report
+    assert "- Hardware / batch size / seq length: ______" in report
+    assert "Use the completed deep-dive extraction sentence as the seed" in report

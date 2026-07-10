@@ -87,7 +87,7 @@ class ReportGenerator:
             "",
             *self._interview_talking_points(ranked_items, summaries),
             "",
-            "## 12. Recommended Deep Dive of the Week",
+            "## Recommended Deep Dive of the Week",
             "",
             *self._deep_dive(ranked_items, summaries, synthesis),
             "",
@@ -421,26 +421,44 @@ class ReportGenerator:
     def _deep_dive(
         self, ranked_items: list[RankedItem], summaries: dict[str, ItemSummary], synthesis: dict
     ) -> list[str]:
-        llm_deep_dive = synthesis.get("deep_dive")
-        if isinstance(llm_deep_dive, dict) and llm_deep_dive.get("title"):
-            lines = [
-                f"**Pick:** [{llm_deep_dive.get('title')}]({llm_deep_dive.get('url', '')})",
-                "",
-                str(llm_deep_dive.get("why_30_60_minutes", "")),
-            ]
-            questions = llm_deep_dive.get("questions_to_answer")
-            if isinstance(questions, list) and questions:
-                lines.extend(["", "**Questions to answer:**"])
-                lines.extend(f"- {question}" for question in questions[:3])
-            return lines
-        if not ranked_items:
+        entry = self._deep_dive_entry(ranked_items, synthesis)
+        if entry is None:
             return ["No deep dive selected."]
-        entry = ranked_items[0]
-        summary = summaries[entry.item.url]
+        item = entry.item
+        summary = summaries[item.url]
+        llm_deep_dive = synthesis.get("deep_dive")
+        if not isinstance(llm_deep_dive, dict):
+            llm_deep_dive = {}
+        why_this_one = llm_deep_dive.get("why_this_one") or llm_deep_dive.get("why_30_60_minutes")
+        if not why_this_one:
+            why_this_one = (
+                f"It ranked highly this week. {summary.why_it_matters} "
+                "Use it to practice converting a technical claim into a product decision."
+            )
+        benchmark = llm_deep_dive.get("benchmark_skepticism")
+        if not isinstance(benchmark, dict):
+            benchmark = {}
+        baseline = benchmark.get("baseline_compared_against") or "______"
+        hardware = benchmark.get("hardware_batch_size_seq_length") or "______"
+        production = benchmark.get("production_survival_check") or "______"
+
         return [
-            f"**Pick:** [{entry.item.title}]({entry.item.url})",
+            f"**Paper:** [{item.title} — {item.author or 'Unknown authors'}]({item.url})",
+            f"**Why this one:** {why_this_one}",
             "",
-            f"Spend 30-60 minutes on this because {summary.why_it_matters} The goal is to extract one reusable PM story: what changed, what metric matters, what decision it affects, and what could break at 10x scale.",
+            "### Reading protocol (20-30 min)",
+            "- [ ] Pass 1 (3 min): Abstract + conclusion only. Kill question: does this touch inference cost, latency, quantization, serving, or dev workflow? If no, stop.",
+            "- [ ] Pass 2 (10 min): Figures and tables only. Note the baseline, hardware, batch size, and sequence length behind the headline claim.",
+            "- [ ] Pass 3 (10 min): Method section at mechanism level. Name the tradeoff (memory vs compute, accuracy vs latency, generality vs speed). Skip all derivations.",
+            "",
+            "### The extraction (fill this in — the deep dive is not done until this sentence is written)",
+            "> This paper showed ______ under conditions ______.",
+            "> This changes the ______ decision for ______ because ______.",
+            "",
+            "### Benchmark skepticism check",
+            f"- Baseline compared against: {baseline}",
+            f"- Hardware / batch size / seq length: {hardware}",
+            f"- Would the claim survive production conditions (vLLM-class baseline, realistic batch sizes)? {production}",
         ]
 
     def _source_index(self, ranked_items: list[RankedItem]) -> list[str]:
@@ -493,6 +511,21 @@ class ReportGenerator:
         if dimensions.get("product_strategy_relevance", 1) >= 4:
             return "Useful for developer-platform strategy, SDK adoption, roadmap sequencing, or product positioning."
         return "High overall score for this week's hardware-native AI PM filter."
+
+    def _deep_dive_entry(self, ranked_items: list[RankedItem], synthesis: dict) -> RankedItem | None:
+        llm_deep_dive = synthesis.get("deep_dive")
+        if isinstance(llm_deep_dive, dict):
+            url = llm_deep_dive.get("url")
+            title = llm_deep_dive.get("title")
+            for entry in ranked_items:
+                if url and entry.item.url == url:
+                    return entry
+                if title and entry.item.title == title:
+                    return entry
+        for entry in ranked_items:
+            if entry.item.category == "research_paper":
+                return entry
+        return ranked_items[0] if ranked_items else None
 
 
 def _escape_table(value: str) -> str:

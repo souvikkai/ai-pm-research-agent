@@ -156,6 +156,8 @@ The generated report uses this structure:
 12. Recommended Deep Dive of the Week
 13. Source Index
 
+The recommended deep dive is an active-reading artifact, not a passive summary. It includes a 20-30 minute reading protocol, blank extraction sentences the reader must complete, and a benchmark skepticism check for baseline, hardware, batch size, sequence length, and production realism. The completed extraction sentence is intended to become the seed for LinkedIn posts and PM interview stories.
+
 ## Example Output
 
 ```markdown
