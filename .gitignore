@@ -5,6 +5,4 @@ __pycache__/
 *.pyc
 *.egg-info/
 data/
-reports/*.md
-!.gitkeep
 .env
