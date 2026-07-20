@@ -3,7 +3,7 @@ name: Weekly AI PM Research Digest
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 15 * * MON"
+    - cron: "0 15 * * FRI"
 
 jobs:
   weekly-digest:

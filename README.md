@@ -134,7 +134,7 @@ Keep `AI_PM_AGENT_USE_LLM_ITEM_SUMMARIES=false` unless you explicitly want DeepS
 
 The repo includes `.github/workflows/weekly-digest.yml`.
 
-It runs every Monday at 15:00 UTC, installs the package, runs tests, generates the digest, and commits the report back to the repo.
+It runs every Friday at 15:00 UTC, installs the package, runs tests, generates the digest, and commits the report back to the repo.
 
 You can also run it manually from GitHub Actions with `workflow_dispatch`.
 
