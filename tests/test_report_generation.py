@@ -10,17 +10,21 @@ def test_report_generator_writes_updated_section_structure(tmp_path):
         "weights": {
             "ai_pm_relevance": 0.15,
             "ai_infrastructure_relevance": 0.20,
-            "compiler_runtime_quantization_relevance": 0.20,
-            "edge_automotive_industrial_relevance": 0.15,
-            "big_tech_accelerator_relevance": 0.10,
-            "product_strategy_relevance": 0.10,
-            "linkedin_portfolio_potential": 0.10,
+            "compiler_runtime_quantization_relevance": 0.17,
+            "edge_automotive_industrial_relevance": 0.08,
+            "gpu_acceleration_relevance": 0.13,
+            "engineering_software_ai_relevance": 0.10,
+            "big_tech_accelerator_relevance": 0.07,
+            "product_strategy_relevance": 0.08,
+            "linkedin_portfolio_potential": 0.07,
         },
         "keyword_groups": {
             "ai_pm_relevance": ["roadmap", "platform"],
             "ai_infrastructure_relevance": ["serving", "gpu"],
             "compiler_runtime_quantization_relevance": ["mlir", "quantization"],
             "edge_automotive_industrial_relevance": ["edge", "industrial"],
+            "gpu_acceleration_relevance": ["gpu acceleration", "cuda", "kernel optimization"],
+            "engineering_software_ai_relevance": ["simulation", "traceability", "engineering software"],
             "big_tech_accelerator_relevance": ["nvidia"],
             "product_strategy_relevance": ["sdk", "model zoo"],
             "linkedin_portfolio_potential": ["demo", "benchmark"],
@@ -33,7 +37,7 @@ def test_report_generator_writes_updated_section_structure(tmp_path):
         category="research_paper",
         published_at=datetime(2026, 6, 30, tzinfo=UTC),
         author="A. Researcher",
-        abstract="MLIR quantization for edge GPU serving improves SDK model zoo confidence.",
+        abstract="MLIR quantization for edge GPU serving improves SDK model zoo confidence. CUDA GPU acceleration improves simulation traceability for engineering software.",
     )
     ranked = RelevanceRanker(scoring_config).rank([item])
 
@@ -46,9 +50,12 @@ def test_report_generator_writes_updated_section_structure(tmp_path):
     assert "## 5. Theme Map" in report
     assert "### Graph Compilers, Runtime, and SDK Platform" in report
     assert "### Edge, Automotive, and Industrial AI" in report
+    assert "### GPU Acceleration and Technical Computing" in report
+    assert "### AI for Engineering Software Workflows" in report
+    assert "**Strategic relevance to Souvik's role:**" in report
     assert "## 7. Big Tech, AI Lab, and Competitive Watch" in report
     assert "### AI Accelerator and Developer Platform Competitive Intelligence" in report
-    assert "### Option D: Compiler / quantization / edge AI angle" in report
+    assert "### Option D: Compiler / GPU / engineering AI angle" in report
     assert "## Recommended Deep Dive of the Week" in report
     assert "### Reading protocol (20-30 min)" in report
     assert "- [ ] Pass 1 (3 min): Abstract + conclusion only." in report

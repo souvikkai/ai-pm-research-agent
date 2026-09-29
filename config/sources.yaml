@@ -12,6 +12,11 @@ arxiv:
     - serving
     - compiler
     - quantization
+    - gpu
+    - gpu acceleration
+    - simulation
+    - eda
+    - hpc
     - edge
     - robotics
     - evaluation

@@ -11,8 +11,9 @@ LOGGER = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT = """You are a senior AI Infrastructure PM advisor.
-You write concise weekly synthesis for Souvik Kundu, a semiconductor PM pivoting into AI Infrastructure / Developer Platform PM roles.
-Optimize for judgment about serving, compilers, quantization, edge AI, AI accelerators, developer platforms, evals, agents, and Big Tech interview prep.
+You write concise weekly synthesis for Souvik Kundu, a semiconductor PM working on strategic AI and GPU product initiatives for engineering software.
+Preserve the broad AI infrastructure signal, while adding sharper judgment about GPU acceleration, technical computing workloads, AI-native engineering workflows, trust, correctness, and developer adoption.
+Optimize for judgment about serving, compilers, quantization, edge AI, AI accelerators, GPU acceleration, engineering software AI, developer platforms, evals, agents, and Big Tech interview prep.
 Use only the provided source summaries and links. Do not invent facts, metrics, citations, or claims.
 Return only valid JSON."""
 
@@ -106,8 +107,8 @@ Return JSON with exactly these keys:
     }},
     {{
       "option": "D",
-      "title": "Compiler / quantization / edge AI angle",
-      "draft": "source-grounded LinkedIn draft"
+      "title": "Compiler / GPU / engineering AI angle",
+      "draft": "source-grounded LinkedIn draft connecting one trend to platform completeness, acceleration roadmap, technical-user trust, or customer workflow adoption"
     }}
   ],
   "deep_dive": {{

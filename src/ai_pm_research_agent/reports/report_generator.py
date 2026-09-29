@@ -148,6 +148,10 @@ class ReportGenerator:
                 sections["edge"].append(entry)
             if keyword_hits(text, ["serving", "datacenter", "vllm", "kserve", "ray serve", "sglang", "gpu", "batching", "throughput", "latency"]):
                 sections["datacenter"].append(entry)
+            if keyword_hits(text, ["gpu acceleration", "gpu-accelerated", "cuda", "rocm", "sycl", "openacc", "openmp offload", "multi-gpu", "hpc", "technical computing", "scientific computing", "sparse solver", "kernel optimization", "simulation kernel", "cae", "eda"]):
+                sections["gpu_strategy"].append(entry)
+            if keyword_hits(text, ["engineering software", "eda", "cae", "simulation", "signoff", "verification", "root cause", "debug", "log analysis", "design space exploration", "engineer copilot", "ai copilot", "workflow automation", "traceability", "explainability", "correctness", "provenance"]):
+                sections["engineering_ai"].append(entry)
             if keyword_hits(text, ["agent", "agents", "rag", "eval", "evaluation", "safety", "guardrail", "tool use", "memory"]):
                 sections["agents"].append(entry)
         return sections
@@ -163,6 +167,7 @@ class ReportGenerator:
             f"- {len(ranked_items)} items met the hardware-native AI PM relevance threshold.",
             f"- Highest-scoring themes: {', '.join(top_domains[:4])}.",
             "- Prioritize items that change SDK roadmap, compiler support, serving cost, edge deployment confidence, or AI accelerator adoption.",
+            "- Add extra attention to GPU acceleration and AI-native engineering software when they connect to real workloads, metrics, trust, and customer adoption.",
             "- Treat consumer AI news as signal only when it changes infrastructure, deployment, developer-platform, or enterprise product decisions.",
             "- Use the top items to prepare interview stories around metrics, tradeoffs, roadmap sequencing, and customer constraints.",
         ]
@@ -238,6 +243,7 @@ class ReportGenerator:
                     f"- **Link:** {item.url}",
                     f"- **Score:** {entry.score.weighted_score}/5",
                     f"- **Why this is high value:** {focus_rationale.get(str(index), self._focus_reason(entry))}",
+                    f"- **Strategic relevance to Souvik's role:** {self._role_relevance(entry)}",
                     f"- **What to extract:** {summary.product_decision}",
                     f"- **Interview angle:** {summary.interview_talking_point}",
                     "",
@@ -270,6 +276,8 @@ class ReportGenerator:
             ("Quantization, Numerics, and Model Compression", "quantization"),
             ("Edge, Automotive, and Industrial AI", "edge"),
             ("Datacenter AI Infrastructure and Serving", "datacenter"),
+            ("GPU Acceleration and Technical Computing", "gpu_strategy"),
+            ("AI for Engineering Software Workflows", "engineering_ai"),
             ("Agents, RAG, Evals, and Safety", "agents"),
         ]
         lines: list[str] = []
@@ -482,6 +490,8 @@ class ReportGenerator:
             "ai_infrastructure_relevance",
             "compiler_runtime_quantization_relevance",
             "edge_automotive_industrial_relevance",
+            "gpu_acceleration_relevance",
+            "engineering_software_ai_relevance",
             "product_strategy_relevance",
         ]
         for entry in ranked_items:
@@ -508,9 +518,25 @@ class ReportGenerator:
             return "Relevant to compiler/runtime/quantization roadmap and AI accelerator software completeness."
         if dimensions.get("edge_automotive_industrial_relevance", 1) >= 4:
             return "Strong fit for edge, automotive, industrial, or safety-constrained deployment thinking."
+        if dimensions.get("gpu_acceleration_relevance", 1) >= 4:
+            return "Strong fit for GPU acceleration strategy, technical computing workloads, and performance roadmap tradeoffs."
+        if dimensions.get("engineering_software_ai_relevance", 1) >= 4:
+            return "Strong fit for AI strategy in engineering software, workflow automation, trust, correctness, and adoption."
         if dimensions.get("product_strategy_relevance", 1) >= 4:
             return "Useful for developer-platform strategy, SDK adoption, roadmap sequencing, or product positioning."
         return "High overall score for this week's hardware-native AI PM filter."
+
+    def _role_relevance(self, entry: RankedItem) -> str:
+        dimensions = entry.score.dimensions
+        if dimensions.get("gpu_acceleration_relevance", 1) >= 3:
+            return "Use this for GPU strategy: workload fit, acceleration metric, portability, and customer proof."
+        if dimensions.get("engineering_software_ai_relevance", 1) >= 3:
+            return "Use this for AI strategy: technical-user workflow value, trust model, traceability, and evaluation."
+        if dimensions.get("ai_infrastructure_relevance", 1) >= 3:
+            return "Use this as broader AI infra signal: serving cost, latency, utilization, reliability, or platform adoption."
+        if dimensions.get("compiler_runtime_quantization_relevance", 1) >= 3:
+            return "Use this as compiler/runtime signal: operator coverage, quantization path, SDK readiness, or model-zoo confidence."
+        return "Use this as background signal unless it changes a roadmap, customer metric, or strategic narrative."
 
     def _deep_dive_entry(self, ranked_items: list[RankedItem], synthesis: dict) -> RankedItem | None:
         llm_deep_dive = synthesis.get("deep_dive")

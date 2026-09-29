@@ -1,11 +1,13 @@
 weights:
-  ai_pm_relevance: 0.15
+  ai_pm_relevance: 0.10
   ai_infrastructure_relevance: 0.20
-  compiler_runtime_quantization_relevance: 0.20
-  edge_automotive_industrial_relevance: 0.15
-  big_tech_accelerator_relevance: 0.10
-  product_strategy_relevance: 0.10
-  linkedin_portfolio_potential: 0.10
+  compiler_runtime_quantization_relevance: 0.17
+  edge_automotive_industrial_relevance: 0.08
+  gpu_acceleration_relevance: 0.13
+  engineering_software_ai_relevance: 0.10
+  big_tech_accelerator_relevance: 0.07
+  product_strategy_relevance: 0.08
+  linkedin_portfolio_potential: 0.07
 
 thresholds:
   include_min_score: 1.45
@@ -99,6 +101,53 @@ keyword_groups:
     - machine vision
     - safety-critical
     - bev
+  gpu_acceleration_relevance:
+    - gpu acceleration
+    - gpu-accelerated
+    - cuda
+    - rocm
+    - sycl
+    - openmp offload
+    - openacc
+    - tensor core
+    - sparse solver
+    - linear solver
+    - simulation kernel
+    - kernel optimization
+    - multi-gpu
+    - hpc
+    - technical computing
+    - scientific computing
+    - cae
+    - eda
+    - finite element
+    - cfd
+    - meshing
+    - solver
+    - cloud gpu
+  engineering_software_ai_relevance:
+    - engineering software
+    - eda
+    - cae
+    - simulation
+    - signoff
+    - verification
+    - root cause
+    - debug
+    - log analysis
+    - design space exploration
+    - optimization workflow
+    - engineer copilot
+    - ai copilot
+    - ai agent
+    - workflow automation
+    - traceability
+    - explainability
+    - correctness
+    - provenance
+    - requirements
+    - constraints
+    - digital twin
   big_tech_accelerator_relevance:
     - google
     - deepmind
@@ -199,3 +248,20 @@ priority_domains:
     - B200
     - MI300
     - Trainium
+  gpu_technical_computing:
+    - CUDA
+    - ROCm
+    - SYCL
+    - OpenACC
+    - OpenMP offload
+    - sparse solvers
+    - simulation kernels
+    - multi-GPU
+    - cloud GPU economics
+  ai_for_engineering_software:
+    - AI copilots for engineers
+    - engineering workflow agents
+    - simulation result analysis
+    - root-cause assistants
+    - design-space exploration
+    - traceable enterprise AI

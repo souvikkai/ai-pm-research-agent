@@ -1,8 +1,8 @@
 # AI PM Research Agent
 
-This repo builds a weekly research digest for Souvik Kundu's pivot from semiconductor / hardware PM into AI Infrastructure and AI PM roles. It is optimized for judgment, not volume: the core question is:
+This repo builds a weekly research digest for Souvik Kundu's work at the intersection of semiconductor PM, AI infrastructure, GPU acceleration, and AI-native engineering software. It is optimized for judgment, not volume: the core question is:
 
-> What did I need to know this week to become a stronger AI Infrastructure / Developer Platform PM for AI accelerators, edge inference, and datacenter AI serving?
+> What did I need to know this week about AI infrastructure, GPU acceleration, and AI-native engineering software to make better strategic PM decisions?
 
 ## What It Does
 
@@ -15,6 +15,8 @@ The report focuses on:
 - Quantization, numerics, and model compression
 - Edge AI, automotive AI, industrial AI, robotics, and constrained deployment
 - Datacenter inference, GPU utilization, serving cost, and reliability
+- GPU acceleration, technical computing, simulation kernels, and workload portability
+- AI for engineering software workflows, including copilots, agents, trust, traceability, correctness, and evaluation
 - AI accelerator and developer-platform competitive intelligence
 - Portfolio project ideas and source-backed LinkedIn drafts
 
@@ -47,7 +49,7 @@ ai-pm-research-agent/
 3. **Deduplicate** by normalized URL, fingerprint, and near-duplicate title matching.
 4. **Score** every item using the weighted AI infrastructure PM rubric in `config/scoring.yaml`.
 5. **Summarize** high-value items with deterministic source-grounded summaries.
-6. **Synthesize** themes across product, infra, compiler, edge, datacenter, and competitive lenses, optionally using DeepSeek after filtering.
+6. **Synthesize** themes across product, infra, compiler, edge, datacenter, GPU acceleration, engineering-software AI, and competitive lenses, optionally using DeepSeek after filtering.
 7. **Generate** `reports/YYYY-MM-DD-weekly-ai-pm-digest.md`.
 8. **Draft LinkedIn posts** with source links from the report.
 
@@ -55,13 +57,15 @@ ai-pm-research-agent/
 
 The current weighted scoring model is:
 
-- AI PM relevance: 15%
+- AI PM relevance: 10%
 - AI infrastructure relevance: 20%
-- Compiler / runtime / quantization relevance: 20%
-- Edge / automotive / industrial relevance: 15%
-- Big Tech / AI accelerator relevance: 10%
-- Product strategy relevance: 10%
-- LinkedIn / portfolio potential: 10%
+- Compiler / runtime / quantization relevance: 17%
+- Edge / automotive / industrial relevance: 8%
+- GPU acceleration relevance: 13%
+- Engineering software AI relevance: 10%
+- Big Tech / AI accelerator relevance: 7%
+- Product strategy relevance: 8%
+- LinkedIn / portfolio potential: 7%
 
 Each dimension is scored 1-5 using keywords and source metadata. This MVP is intentionally transparent and easy to tune. Edit `config/scoring.yaml` to adjust weights, thresholds, or keyword groups.
 
@@ -156,6 +160,8 @@ The generated report uses this structure:
 12. Recommended Deep Dive of the Week
 13. Source Index
 
+The theme map preserves the broader AI infrastructure backbone while adding dedicated slices for GPU acceleration / technical computing and AI for engineering software workflows. Must-focus items include a `Strategic relevance to Souvik's role` field so the same item can be read through a broader infra lens or a role-specific GPU / engineering-AI lens.
+
 The recommended deep dive is an active-reading artifact, not a passive summary. It includes a 20-30 minute reading protocol, blank extraction sentences the reader must complete, and a benchmark skepticism check for baseline, hardware, batch size, sequence length, and production realism. The completed extraction sentence is intended to become the seed for LinkedIn posts and PM interview stories.
 
 ## Example Output
@@ -166,8 +172,8 @@ The recommended deep dive is an active-reading artifact, not a passive summary. 
 ## 1. Executive Summary
 
 - 18 items met the hardware-native AI PM relevance threshold.
-- Highest-scoring themes: compiler runtime quantization relevance, AI infrastructure relevance, edge automotive industrial relevance.
-- Prioritize items that change SDK roadmap, compiler support, serving cost, edge deployment confidence, or AI accelerator adoption.
+- Highest-scoring themes: AI infrastructure relevance, compiler runtime quantization relevance, GPU acceleration relevance.
+- Prioritize items that change SDK roadmap, compiler support, serving cost, GPU acceleration strategy, engineering workflow trust, or AI accelerator adoption.
 
 ## 15. Recommended Deep Dive of the Week
 
@@ -185,7 +191,7 @@ Implemented:
 - Papers with Code collector with trending-page fallback
 - RSS collector for newsletters, blogs, and podcasts
 - Deduplication
-- Hardware-native weighted scoring
+- Hardware-native weighted scoring with GPU acceleration and engineering-software AI lenses
 - SQLite persistence
 - Markdown report generation
 - Source index

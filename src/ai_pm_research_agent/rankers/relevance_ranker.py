@@ -50,6 +50,8 @@ def _apply_strategic_core_adjustment(weighted: float, dimensions: dict[str, int]
         "ai_infrastructure_relevance",
         "compiler_runtime_quantization_relevance",
         "edge_automotive_industrial_relevance",
+        "gpu_acceleration_relevance",
+        "engineering_software_ai_relevance",
     ]
     core_max = max(dimensions.get(name, 1) for name in core_dimensions)
     if core_max < 3:

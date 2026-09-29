@@ -49,12 +49,12 @@ class LinkedInGenerator:
             },
             {
                 "option": "D",
-                "title": "Compiler / quantization / edge AI angle",
+                "title": "Compiler / GPU / engineering AI angle",
                 "draft": (
-                    "Compiler and quantization work can look like implementation detail until you view it through SDK adoption.\n\n"
-                    "Operator coverage, quantized graph lowering, model zoo completeness, and edge/datacenter benchmark quality all shape "
-                    "developer confidence. A missing graph pattern or unsupported datatype can become a product adoption blocker.\n\n"
-                    "The PM question: which models should be forcing functions for compiler completeness and customer demos?"
+                    "Compiler, GPU, and engineering-AI work can look like implementation detail until you view it through customer workflow adoption.\n\n"
+                    "Operator coverage, acceleration portability, model zoo completeness, traceability, and benchmark quality all shape "
+                    "developer confidence. A missing graph pattern, weak GPU path, or untrusted AI assistant can become a product adoption blocker.\n\n"
+                    "The PM question: which workloads should become forcing functions for platform completeness, customer demos, and roadmap proof?"
                     f"{extraction_seed_note}\n\nSources:\n{source_lines}"
                 ),
             },

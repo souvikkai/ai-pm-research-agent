@@ -9,6 +9,8 @@ DOMAIN_KEYWORDS = {
     "quantization": ["quantization", "int8", "int4", "fp8", "mxfp", "awq", "gptq", "smoothquant", "kv cache"],
     "edge": ["edge", "automotive", "adas", "robotics", "industrial", "embedded", "npu", "dsp", "sensor", "real-time"],
     "datacenter": ["serving", "vllm", "triton inference", "ray serve", "kserve", "sglang", "gpu", "batching", "latency", "throughput"],
+    "gpu_strategy": ["gpu acceleration", "gpu-accelerated", "cuda", "rocm", "sycl", "multi-gpu", "hpc", "technical computing", "scientific computing", "sparse solver", "kernel optimization", "simulation kernel", "cae", "eda"],
+    "engineering_ai": ["engineering software", "eda", "cae", "simulation", "signoff", "verification", "root cause", "debug", "log analysis", "design space exploration", "engineer copilot", "ai copilot", "workflow automation", "traceability", "explainability", "correctness", "provenance"],
     "agents": ["agent", "rag", "eval", "safety", "tool use", "memory", "guardrail"],
 }
 
@@ -66,6 +68,10 @@ def _pm_implication(item: CandidateItem, domain_notes: dict[str, str]) -> str:
         return "A PM should frame the implication around deployment constraints: power, thermals, memory, latency, safety, and customer integration effort."
     if "datacenter" in domain_notes:
         return "A PM should translate the update into cost per token, TTFT, throughput, utilization, reliability, and operational simplicity."
+    if "gpu_strategy" in domain_notes:
+        return "A PM should ask which technical workloads are worth GPU acceleration and what customer metric proves the acceleration matters."
+    if "engineering_ai" in domain_notes:
+        return "A PM should ask where AI can improve engineering productivity without weakening trust, traceability, correctness, or adoption."
     return "A PM should identify what customer workflow, roadmap bet, or competitive positioning this update could change."
 
 
@@ -78,6 +84,10 @@ def _infra_implication(domain_notes: dict[str, str]) -> str:
         return "Likely touches constrained deployment across CPU, GPU, NPU, DSP, embedded Linux, or safety-critical systems."
     if "quantization" in domain_notes:
         return "Likely touches datatype support, memory footprint, throughput, accuracy, or hardware enablement."
+    if "gpu_strategy" in domain_notes:
+        return "Likely touches GPU utilization, acceleration portability, solver/kernel performance, memory limits, or cloud GPU economics."
+    if "engineering_ai" in domain_notes:
+        return "Likely touches retrieval, workflow automation, evaluation, traceability, or human-in-the-loop reliability for technical users."
     return "Infrastructure implication should be validated against latency, cost, reliability, and adoption metrics."
 
 
@@ -94,6 +104,10 @@ def _product_decision(domain_notes: dict[str, str]) -> str:
         return "Decide which edge demos, reference designs, and deployment constraints deserve roadmap priority."
     if "datacenter" in domain_notes:
         return "Decide whether serving-stack work should target latency, throughput, cost per token, autoscaling, or reliability first."
+    if "gpu_strategy" in domain_notes:
+        return "Decide which workloads, kernels, solvers, or cloud GPU paths deserve acceleration roadmap priority."
+    if "engineering_ai" in domain_notes:
+        return "Decide which engineering workflows should get copilots, agents, retrieval, or explainability investments first."
     return "Decide whether this is a roadmap input, interview talking point, LinkedIn idea, or background reading."
 
 
