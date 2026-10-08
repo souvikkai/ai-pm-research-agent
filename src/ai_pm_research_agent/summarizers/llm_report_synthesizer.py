@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 
 from ai_pm_research_agent.llm.deepseek_client import DeepSeekClient
 from ai_pm_research_agent.storage.models import ItemSummary, RankedItem
@@ -27,6 +28,7 @@ class LLMReportSynthesizer:
         self,
         ranked_items: list[RankedItem],
         summaries: dict[str, ItemSummary],
+        reporting_window: tuple[datetime, datetime] | None = None,
     ) -> dict:
         self.last_error = None
         if not ranked_items:
@@ -34,7 +36,7 @@ class LLMReportSynthesizer:
         try:
             content = self.client.complete(
                 SYSTEM_PROMPT,
-                _build_prompt(ranked_items, summaries),
+                _build_prompt(ranked_items, summaries, reporting_window),
             )
             return _parse_json(content)
         except Exception as exc:
@@ -43,7 +45,10 @@ class LLMReportSynthesizer:
             return {}
 
 
-def _build_prompt(ranked_items: list[RankedItem], summaries: dict[str, ItemSummary]) -> str:
+def _build_prompt(
+    ranked_items: list[RankedItem], summaries: dict[str, ItemSummary],
+    reporting_window: tuple[datetime, datetime] | None = None,
+) -> str:
     item_blocks: list[str] = []
     for index, entry in enumerate(ranked_items[:12], start=1):
         item = entry.item
@@ -55,6 +60,7 @@ def _build_prompt(ranked_items: list[RankedItem], summaries: dict[str, ItemSumma
                     f"Title: {item.title}",
                     f"Source: {item.source}",
                     f"Category: {item.category}",
+                    f"Publication timestamp: {item.published_at.isoformat() if item.published_at else 'Unknown'}",
                     f"URL: {item.url}",
                     f"Score: {entry.score.weighted_score}/5",
                     f"Score reasons: {'; '.join(entry.score.reasons) or 'None'}",
@@ -67,7 +73,14 @@ def _build_prompt(ranked_items: list[RankedItem], summaries: dict[str, ItemSumma
         )
     ranked_items_text = "\n\n".join(item_blocks)
 
-    return f"""Ranked weekly items:
+    window_text = (
+        f"Research publication window (inclusive, UTC): {reporting_window[0].isoformat()} to {reporting_window[1].isoformat()}"
+        if reporting_window else "Reporting window: not provided. Do not infer publication recency."
+    )
+    return f"""{window_text}
+Research papers are eligible by original publication only. Community submission, updates, discovery, and trending dates do not establish publication recency.
+
+Ranked weekly items:
 
 {ranked_items_text}
 

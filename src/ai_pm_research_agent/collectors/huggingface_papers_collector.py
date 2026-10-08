@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from ai_pm_research_agent.collectors.base import Collector
 from ai_pm_research_agent.storage.models import CandidateItem
-from ai_pm_research_agent.utils.dates import local_now, parse_date
+from ai_pm_research_agent.utils.dates import parse_publication_date, publication_in_window, utc_now
 from ai_pm_research_agent.utils.text import clean_html, normalize_space
 
 LOGGER = logging.getLogger(__name__)
@@ -26,10 +26,12 @@ class HuggingFacePapersCollector(Collector):
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
 
-    def collect(self, lookback_days: int = 7) -> list[CandidateItem]:
+    def collect(self, lookback_days: int = 7, now: datetime | None = None) -> list[CandidateItem]:
         requests = _requests()
         items: list[CandidateItem] = []
-        today = local_now().date()
+        now = now or utc_now()
+        cutoff = now - timedelta(days=lookback_days)
+        today = now.date()
         for offset in range(lookback_days):
             date = today - timedelta(days=offset)
             try:
@@ -52,7 +54,7 @@ class HuggingFacePapersCollector(Collector):
             entries = payload if isinstance(payload, list) else payload.get("dailyPapers", [])
             for entry in entries:
                 item = self._parse_entry(entry)
-                if item:
+                if item and publication_in_window(item.published_at, cutoff, now):
                     items.append(item)
         return items
 
@@ -81,13 +83,9 @@ class HuggingFacePapersCollector(Collector):
             or entry.get("description")
             or ""
         )
-        published = (
-            paper.get("publishedAt")
-            or paper.get("published_at")
-            or entry.get("publishedAt")
-            or entry.get("createdAt")
-            or entry.get("date")
-        )
+        # Daily-list entry timestamps describe community activity, not publication.
+        original_paper = entry.get("paper")
+        published = original_paper.get("publishedAt") if isinstance(original_paper, dict) else None
         metadata = {
             "source_family": "huggingface_papers",
             "arxiv_id": arxiv_id,
@@ -95,12 +93,16 @@ class HuggingFacePapersCollector(Collector):
             "github_repo": paper.get("githubRepo") or entry.get("githubRepo"),
             "project_page": paper.get("projectPage") or entry.get("projectPage"),
             "submitted_by": _submitter_name(entry.get("submittedBy") or entry.get("submitter")),
+            "community_dates": {
+                key: entry[key] for key in ("publishedAt", "createdAt", "updatedAt", "date")
+                if entry.get(key)
+            },
         }
         return CandidateItem(
             title=normalize_space(clean_html(title)),
             source="Hugging Face Daily Papers",
             author=authors or None,
-            published_at=parse_date(published),
+            published_at=parse_publication_date(published),
             url=url,
             category="research_paper",
             abstract=clean_html(summary),

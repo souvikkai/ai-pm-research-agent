@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timedelta
 from typing import Any
 
 from ai_pm_research_agent.collectors.base import Collector
 from ai_pm_research_agent.storage.models import CandidateItem
-from ai_pm_research_agent.utils.dates import days_ago, parse_date
+from ai_pm_research_agent.utils.dates import parse_publication_date, publication_in_window, utc_now
 from ai_pm_research_agent.utils.text import clean_html, normalize_space
 
 LOGGER = logging.getLogger(__name__)
@@ -25,13 +26,18 @@ class PapersWithCodeCollector(Collector):
         self.trending_url = trending_url
         self.timeout_seconds = timeout_seconds
 
-    def collect(self, lookback_days: int = 7) -> list[CandidateItem]:
-        api_items = self._collect_api(lookback_days)
+    def collect(self, lookback_days: int = 7, now: datetime | None = None) -> list[CandidateItem]:
+        now = now or utc_now()
+        cutoff = now - timedelta(days=lookback_days)
+        api_items = self._collect_api(lookback_days, now)
         if api_items:
             return api_items[: self.max_results]
-        return self._collect_trending_page()[: self.max_results]
+        return [
+            item for item in self._collect_trending_page()
+            if publication_in_window(item.published_at, cutoff, now)
+        ][: self.max_results]
 
-    def _collect_api(self, lookback_days: int) -> list[CandidateItem]:
+    def _collect_api(self, lookback_days: int, now: datetime | None = None) -> list[CandidateItem]:
         requests = _requests()
         try:
             response = requests.get(
@@ -47,13 +53,14 @@ class PapersWithCodeCollector(Collector):
         except requests.RequestException as exc:
             LOGGER.warning("Failed to fetch Papers with Code API: %s", exc)
             return []
-        entries = payload.get("results", payload if isinstance(payload, list) else [])
-        cutoff = days_ago(lookback_days)
+        entries = payload if isinstance(payload, list) else payload.get("results", [])
+        now = now or utc_now()
+        cutoff = now - timedelta(days=lookback_days)
         items = [self._parse_api_entry(entry) for entry in entries]
         return [
             item
             for item in items
-            if item and (not item.published_at or item.published_at >= cutoff)
+            if item and publication_in_window(item.published_at, cutoff, now)
         ]
 
     def _parse_api_entry(self, entry: dict[str, Any]) -> CandidateItem | None:
@@ -74,7 +81,7 @@ class PapersWithCodeCollector(Collector):
             title=normalize_space(clean_html(title)),
             source="Papers with Code",
             author=_authors_to_string(entry.get("authors") or []),
-            published_at=parse_date(entry.get("published") or entry.get("date")),
+            published_at=parse_publication_date(entry.get("published")),
             url=url,
             category="research_paper",
             abstract=clean_html(entry.get("abstract") or ""),

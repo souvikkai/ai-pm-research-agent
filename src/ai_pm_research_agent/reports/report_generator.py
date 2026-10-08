@@ -30,13 +30,16 @@ class ReportGenerator:
         self.llm_summarizer = self._build_llm_summarizer()
         self.llm_report_synthesizer = self._build_llm_report_synthesizer()
 
-    def generate(self, ranked_items: list[RankedItem], report_date: datetime | None = None) -> Path:
+    def generate(
+        self, ranked_items: list[RankedItem], report_date: datetime | None = None,
+        reporting_window: tuple[datetime, datetime] | None = None,
+    ) -> Path:
         date_slug = report_date_slug(report_date)
         output_path = self.report_dir / f"{date_slug}-weekly-ai-pm-digest.md"
         summaries = self._summaries(ranked_items)
         sections = self._section_items(ranked_items)
         ranks = {entry.item.url: index for index, entry in enumerate(ranked_items, start=1)}
-        synthesis = self._synthesis(ranked_items, summaries)
+        synthesis = self._synthesis(ranked_items, summaries, reporting_window)
 
         lines: list[str] = [
             f"# Weekly AI PM Research Digest — {date_slug}",
@@ -96,6 +99,9 @@ class ReportGenerator:
             *self._source_index(ranked_items),
             "",
         ]
+        if reporting_window:
+            cutoff, now = reporting_window
+            lines[2:2] = [f"Research publication window (inclusive, UTC): {cutoff.isoformat()} to {now.isoformat()}", ""]
         output_path.write_text("\n".join(lines), encoding="utf-8")
         return output_path
 
@@ -125,11 +131,12 @@ class ReportGenerator:
         return LLMReportSynthesizer(self.llm_client)
 
     def _synthesis(
-        self, ranked_items: list[RankedItem], summaries: dict[str, ItemSummary]
+        self, ranked_items: list[RankedItem], summaries: dict[str, ItemSummary],
+        reporting_window: tuple[datetime, datetime] | None = None,
     ) -> dict:
         if self.llm_report_synthesizer is None:
             return {}
-        synthesis = self.llm_report_synthesizer.synthesize(ranked_items, summaries)
+        synthesis = self.llm_report_synthesizer.synthesize(ranked_items, summaries, reporting_window)
         if not synthesis and self.llm_report_synthesizer.last_error:
             return {"_llm_error": self.llm_report_synthesizer.last_error}
         return synthesis
@@ -240,6 +247,7 @@ class ReportGenerator:
                     f"### Focus {index}: {item.title}",
                     "",
                     f"- **Source:** {item.source}",
+                    f"- **Publication date:** {item.published_at.date().isoformat() if item.published_at else 'Unknown'}",
                     f"- **Link:** {item.url}",
                     f"- **Score:** {entry.score.weighted_score}/5",
                     f"- **Why this is high value:** {focus_rationale.get(str(index), self._focus_reason(entry))}",
@@ -257,14 +265,14 @@ class ReportGenerator:
         if not entries:
             return ["No ranked items available."]
         lines = [
-            "| Rank | Item | Category | Score | Why It Matters |",
-            "|---:|---|---|---:|---|",
+            "| Rank | Item | Publication Date | Category | Score | Why It Matters |",
+            "|---:|---|---|---|---:|---|",
         ]
         for index, entry in enumerate(entries, start=1):
             item = entry.item
             summary = summaries[item.url]
             lines.append(
-                f"| {index} | [{_escape_table(item.title)}]({item.url}) | {item.category} | {entry.score.weighted_score}/5 | {_escape_table(summary.one_sentence_summary)} |"
+                f"| {index} | [{_escape_table(item.title)}]({item.url}) | {item.published_at.date().isoformat() if item.published_at else 'Unknown'} | {item.category} | {entry.score.weighted_score}/5 | {_escape_table(summary.one_sentence_summary)} |"
             )
         return lines
 

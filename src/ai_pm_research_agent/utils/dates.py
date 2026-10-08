@@ -28,6 +28,25 @@ def utc_now() -> datetime:
     return datetime.now(UTC)
 
 
+def parse_publication_date(value: object) -> datetime | None:
+    """Parse complete ISO publication dates without guessing missing date components."""
+    try:
+        if isinstance(value, datetime):
+            parsed = value
+        elif isinstance(value, str):
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        else:
+            return None
+        return parsed.replace(tzinfo=UTC) if parsed.tzinfo is None else parsed.astimezone(UTC)
+    except (ValueError, TypeError, OverflowError):
+        return None
+
+
+def publication_in_window(value: object, cutoff: datetime, now: datetime) -> bool:
+    published = parse_publication_date(value)
+    return published is not None and cutoff <= published <= now
+
+
 def local_now() -> datetime:
     timezone_name = os.getenv("AI_PM_AGENT_TIMEZONE", "America/Phoenix")
     try:

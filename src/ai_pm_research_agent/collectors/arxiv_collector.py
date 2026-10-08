@@ -3,10 +3,11 @@ from __future__ import annotations
 import logging
 import urllib.parse
 import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
 
 from ai_pm_research_agent.collectors.base import Collector
 from ai_pm_research_agent.storage.models import CandidateItem
-from ai_pm_research_agent.utils.dates import days_ago, parse_date
+from ai_pm_research_agent.utils.dates import parse_publication_date, publication_in_window, utc_now
 from ai_pm_research_agent.utils.text import clean_html, normalize_space
 
 LOGGER = logging.getLogger(__name__)
@@ -19,9 +20,10 @@ class ArxivCollector(Collector):
         self.query_terms = query_terms
         self.max_results_per_category = max_results_per_category
 
-    def collect(self, lookback_days: int = 7) -> list[CandidateItem]:
+    def collect(self, lookback_days: int = 7, now: datetime | None = None) -> list[CandidateItem]:
         requests = _requests()
-        cutoff = days_ago(lookback_days)
+        now = now or utc_now()
+        cutoff = now - timedelta(days=lookback_days)
         items: list[CandidateItem] = []
         for category in self.categories:
             term_query = " OR ".join(f'all:"{term}"' for term in self.query_terms)
@@ -43,7 +45,7 @@ class ArxivCollector(Collector):
                 continue
             for entry in root.findall(f"{ATOM}entry"):
                 item = self._parse_entry(entry, category)
-                if item.published_at and item.published_at < cutoff:
+                if not publication_in_window(item.published_at, cutoff, now):
                     continue
                 items.append(item)
         return items
@@ -51,7 +53,7 @@ class ArxivCollector(Collector):
     def _parse_entry(self, entry: ET.Element, category: str) -> CandidateItem:
         title = normalize_space(_text(entry, f"{ATOM}title") or "Untitled")
         abstract = clean_html(_text(entry, f"{ATOM}summary"))
-        published = parse_date(_text(entry, f"{ATOM}published"))
+        published = parse_publication_date(_text(entry, f"{ATOM}published"))
         authors = [
             normalize_space(name.text or "")
             for name in entry.findall(f"{ATOM}author/{ATOM}name")

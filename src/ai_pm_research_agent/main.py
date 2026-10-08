@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from ai_pm_research_agent.collectors.arxiv_collector import ArxivCollector
@@ -17,6 +18,7 @@ from ai_pm_research_agent.rankers.relevance_ranker import RelevanceRanker
 from ai_pm_research_agent.rankers.selection import select_ranked_items
 from ai_pm_research_agent.reports.report_generator import ReportGenerator
 from ai_pm_research_agent.storage.db import ItemStore
+from ai_pm_research_agent.utils.dates import publication_in_window, utc_now
 from ai_pm_research_agent.utils.env import load_env_file
 from ai_pm_research_agent.utils.logging import configure_logging
 
@@ -75,6 +77,8 @@ def _enabled_sources(sources: list[dict]) -> list[dict]:
 
 
 def run(lookback_days: int, project_root: Path = PROJECT_ROOT) -> Path:
+    now = utc_now()
+    cutoff = now - timedelta(days=lookback_days)
     load_env_file(project_root)
     sources_config = load_sources_config(project_root)
     scoring_config = load_scoring_config(project_root)
@@ -83,7 +87,22 @@ def run(lookback_days: int, project_root: Path = PROJECT_ROOT) -> Path:
     candidates = []
     for collector in collectors:
         LOGGER.info("Collecting with %s", collector.__class__.__name__)
-        candidates.extend(collector.collect(lookback_days=lookback_days))
+        if isinstance(collector, (ArxivCollector, HuggingFacePapersCollector, PapersWithCodeCollector)):
+            candidates.extend(collector.collect(lookback_days=lookback_days, now=now))
+        else:
+            candidates.extend(collector.collect(lookback_days=lookback_days))
+
+    collected_count = len(candidates)
+    candidates = [
+        item
+        for item in candidates
+        if item.category != "research_paper"
+        or publication_in_window(item.published_at, cutoff, now)
+    ]
+    LOGGER.info(
+        "Excluded %s papers outside publication window [%s, %s]",
+        collected_count - len(candidates), cutoff.isoformat(), now.isoformat(),
+    )
 
     unique_items = deduplicate_items(candidates)
     LOGGER.info("Collected %s candidates, %s unique", len(candidates), len(unique_items))
@@ -97,7 +116,7 @@ def run(lookback_days: int, project_root: Path = PROJECT_ROOT) -> Path:
     ranked = select_ranked_items(unique_items, ranker, scoring_config)
 
     report_dir = os.getenv("AI_PM_AGENT_REPORT_DIR", str(project_root / "reports"))
-    report_path = ReportGenerator(report_dir).generate(ranked)
+    report_path = ReportGenerator(report_dir).generate(ranked, reporting_window=(cutoff, now))
     LOGGER.info("Wrote report to %s", report_path)
     return report_path
 
